@@ -2,7 +2,7 @@ package examples
 import h3 "../"
 
 import "core:math"
-import "core:runtime"
+import "base:runtime"
 import "core:fmt"
 
 R :: 6371.0088

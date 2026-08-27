@@ -1,8 +1,9 @@
-# examples
+# Examples and tests
+
 ```bash
-# run all examples
+# run all examples and tests
 odin test .
 
-# run an example by test name
-odin test . -test-name:test_edge
+# run a single test by name
+odin test . -define:ODIN_TEST_NAMES=test_edge
 ```

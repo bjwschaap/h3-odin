@@ -1,4 +1,4 @@
-# usage : python ./gen_procedures.py > procedures.odin
+# usage: python3 ./gen_procedures.py > ../procedures.odin
 import re
 
 f_src = open("h3api.h", "r")
@@ -15,10 +15,18 @@ import c "core:c"
 Index :: u64
 Error :: u32
 
-foreign import h3api "_gen/libh3.a"
+when ODIN_OS == .Darwin && ODIN_ARCH == .amd64 {
+	foreign import lib "_gen/libh3_darwin_amd64.a"
+} else when ODIN_OS == .Darwin && ODIN_ARCH == .arm64 {
+	foreign import lib "_gen/libh3_darwin_arm64.a"
+} else when ODIN_OS == .Linux && ODIN_ARCH == .amd64 {
+	foreign import lib "_gen/libh3_linux_amd64.a"
+} else when ODIN_OS == .Linux && ODIN_ARCH == .arm64 {
+	foreign import lib "_gen/libh3_linux_arm64.a"
+}
 
 @(default_calling_convention="c")
-foreign h3api {
+foreign lib {
 '''
 
 print(header)
@@ -70,7 +78,8 @@ def get_return_type(t):
 
 def get_args_types(args):
     result = ''
-    if args[0] == '':
+    # C headers may spell an empty parameter list as either () or (void).
+    if len(args) == 1 and args[0].strip() in ('', 'void'):
         return result
     for arg in args:
         tokens = arg.lstrip().split(' ')

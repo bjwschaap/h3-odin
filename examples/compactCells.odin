@@ -1,7 +1,7 @@
 package examples
 
 import "core:fmt"
-import "core:runtime"
+import "base:runtime"
 import h3 "../"
 
 compactCells :: proc(){

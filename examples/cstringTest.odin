@@ -11,8 +11,9 @@ cstringTest :: proc() {
     h3.latLngToCell(&g, 10, &out)
 
     str := make([]u8, 17)
+    defer delete(str)
     err := h3.h3ToString(out, str, 17)
-    fmt.printf("h3ToString result: %s\n", string(str))
+    fmt.printf("h3ToString result: %s\n", cstring(&str[0]))
 
     str2 := cstring("8aaa45945b27fff")
     out2 :h3.Index
