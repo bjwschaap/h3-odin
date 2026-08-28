@@ -7,11 +7,11 @@ index :: proc(){
     location: h3.LatLng
     location.lat = h3.degsToRads(40.689167)
     location.lng = h3.degsToRads(-74.044444)
-    resolution := 10
+    resolution: i32 = 10
     indexed: h3.Index
 
-    if (h3.latLngToCell(&location, resolution, &indexed) != u32(h3.error_codes.E_SUCCESS)) {
-        fmt.println("Failed")
+    if err := h3.latLngToCell(&location, resolution, &indexed); err != .E_SUCCESS {
+        fmt.println(h3.error_message(err))
         return
     }
 
@@ -19,14 +19,14 @@ index :: proc(){
 
     // Get the vertices of the H3 index.
     boundary: h3.CellBoundary
-    if (h3.cellToBoundary(indexed, &boundary) != u32(h3.error_codes.E_SUCCESS)) {
-        fmt.println("Failed")
+    if err := h3.cellToBoundary(indexed, &boundary); err != .E_SUCCESS {
+        fmt.println(h3.error_message(err))
         return
     }
     
     // Indexes can have different number of vertices under some cases,
     // which is why boundary.numVerts is needed.
-    for v := 0; v < boundary.numVerts; v+=1 {
+    for v in 0..<int(boundary.numVerts) {
         fmt.printf("Boundary vertex #%d: %.6f, %.6f\n",
                 v,
                 h3.radsToDegs(boundary.verts[v].lat),
@@ -35,8 +35,8 @@ index :: proc(){
 
     // Get the center coordinates.
     center: h3.LatLng
-    if (h3.cellToLatLng(indexed, &center) != u32(h3.error_codes.E_SUCCESS)) {
-        fmt.println("Failed")
+    if err := h3.cellToLatLng(indexed, &center); err != .E_SUCCESS {
+        fmt.println(h3.error_message(err))
         return
     }
     

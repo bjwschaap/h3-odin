@@ -13,7 +13,6 @@ package h3
 import c "core:c"
 
 Index :: u64
-Error :: u32
 
 when ODIN_OS == .Darwin && ODIN_ARCH == .amd64 {
 	foreign import lib "_gen/libh3_darwin_amd64.a"
@@ -52,21 +51,21 @@ for line in f_src:
 
 def convert_type(t):
     if t == 'int':
-        return 'int'
+        return 'c.int'
     elif t == 'H3Error':
         return 'Error'
     elif t == 'double':
-        return 'f64'
+        return 'c.double'
     elif t == 'void':
         return ''
     elif t == 'int64_t':
-        return 'i64'
+        return 'c.int64_t'
     elif t == 'H3Index':
         return 'Index'
     elif t == 'uint32_t':
-        return 'u32'
+        return 'c.uint32_t'
     elif t == 'size_t':
-        return 'u64'
+        return 'c.size_t'
     else:
         return t
 
@@ -108,7 +107,7 @@ for l in lines:
                 ).replace('DECLSPEC ', ''
                 ).replace(');', ''
                 ).replace('const char *','cstring '
-                ).replace('char *','[]u8 '
+                ).replace('char *','^c.char '
                 ).replace('H3_EXPORT',''
                 ).replace(')',''
                 ).replace('const ', '$'

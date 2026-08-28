@@ -1,5 +1,7 @@
 package h3
 
+import c "core:c"
+
 // latitude/longitude in radians
 LatLng :: struct {
     lat: f64,
@@ -8,26 +10,26 @@ LatLng :: struct {
 
 // cell boundary in latitude/longitude
 CellBoundary :: struct {
-    numVerts: int,
+    numVerts: c.int,
     verts: [MAX_CELL_BNDRY_VERTS]LatLng,
 }
 
 // similar to CellBoundary, but requires more alloc work
 GeoLoop :: struct {
-    numVerts: int,
+    numVerts: c.int,
     verts: ^LatLng,
 }
 
 // Simplified core of GeoJSON Polygon coordinates definition
 GeoPolygon :: struct {
     geoLoop: GeoLoop,
-    numHoles: int,
+    numHoles: c.int,
     holes: ^GeoLoop,
 }
 
 // Simplified core of GeoJSON MultiPolygon coordinates definition
 GeoMultiPolygon :: struct {
-    numPolygons: int,
+    numPolygons: c.int,
     polygons: ^GeoPolygon,
 }
 
@@ -53,7 +55,6 @@ LinkedGeoPolygon :: struct{
  
 // IJ hexagon coordinates, Each axis is spaced 120 degrees apart.
 CoordIJ :: struct {
-    i: int,
-    j: int,
+    i: c.int,
+    j: c.int,
 }
- 

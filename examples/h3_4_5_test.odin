@@ -1,12 +1,16 @@
 package examples
 
 import "core:testing"
+import c "core:c"
 import h3 "../"
 
-H3_SUCCESS :: h3.Error(h3.error_codes.E_SUCCESS)
+H3_SUCCESS :: h3.Error.E_SUCCESS
+
+#assert(size_of(h3.Error) == size_of(c.uint32_t))
+#assert(size_of(h3.CoordIJ) == 2 * size_of(c.int))
 
 expect_success :: proc(t: ^testing.T, err: h3.Error) -> bool {
-	return testing.expect_value(t, err, H3_SUCCESS)
+	return testing.expectf(t, h3.error_is_success(err), "unexpected H3 error: %s", h3.error_message(err))
 }
 
 expect_approx :: proc(t: ^testing.T, actual, expected, tolerance: f64) -> bool {
@@ -29,8 +33,8 @@ test_h3_4_5_version_and_error_descriptions :: proc(t: ^testing.T) {
 	testing.expect_value(t, h3.H3_VERSION_MAJOR, 4)
 	testing.expect_value(t, h3.H3_VERSION_MINOR, 5)
 	testing.expect_value(t, h3.H3_VERSION_PATCH, 0)
-	testing.expect_value(t, string(h3.describeH3Error(H3_SUCCESS)), "Success")
-	testing.expect(t, len(string(h3.describeH3Error(h3.Error(h3.error_codes.E_INDEX_INVALID)))) > 0)
+	testing.expect_value(t, h3.error_message(H3_SUCCESS), "Success")
+	testing.expect(t, len(h3.error_message(.E_INDEX_INVALID)) > 0)
 }
 
 @(test)
@@ -109,7 +113,7 @@ test_h3_4_5_index_construction :: proc(t: ^testing.T) {
 		return
 	}
 
-	digit := 0
+	digit: c.int = 0
 	if !expect_success(t, h3.getIndexDigit(parent, 1, &digit)) {
 		return
 	}
@@ -121,9 +125,9 @@ test_h3_4_5_index_construction :: proc(t: ^testing.T) {
 		testing.expect_value(t, h3.isValidIndex(reconstructed), 1)
 	}
 
-	invalid_digit := 7
+	invalid_digit: c.int = 7
 	err := h3.constructCell(1, h3.getBaseCellNumber(parent), &invalid_digit, &reconstructed)
-	testing.expect_value(t, err, h3.Error(h3.error_codes.E_DIGIT_DOMAIN))
+	testing.expect_value(t, err, h3.Error.E_DIGIT_DOMAIN)
 }
 
 @(test)
@@ -156,7 +160,7 @@ test_h3_4_5_experimental_polygon_fill :: proc(t: ^testing.T) {
 		{h3.degsToRads(37.82), h3.degsToRads(-122.54)},
 	}
 	polygon := h3.GeoPolygon{
-		geoLoop = h3.GeoLoop{numVerts = len(vertices), verts = &vertices[0]},
+		geoLoop = h3.GeoLoop{numVerts = c.int(len(vertices)), verts = &vertices[0]},
 	}
 
 	max_size: i64
@@ -183,5 +187,47 @@ test_h3_4_5_experimental_polygon_fill :: proc(t: ^testing.T) {
 	invalid_size: i64
 	invalid_mode := u32(h3.containment_mode.CONTAINMENT_INVALID)
 	err := h3.maxPolygonToCellsSizeExperimental(&polygon, 9, invalid_mode, &invalid_size)
-	testing.expect_value(t, err, h3.Error(h3.error_codes.E_OPTION_INVALID))
+	testing.expect_value(t, err, h3.Error.E_OPTION_INVALID)
+}
+
+@(test)
+test_c_int_output_arrays :: proc(t: ^testing.T) {
+	origin: h3.Index = 0x8a2a1072b59ffff
+	cells: [7]h3.Index
+	distances: [7]c.int
+	if !expect_success(t, h3.gridDiskDistances(origin, 1, &cells[0], &distances[0])) {
+		return
+	}
+
+	counts: [2]int
+	for distance in distances {
+		if testing.expect(t, distance >= 0 && distance <= 1) {
+			counts[distance] += 1
+		}
+	}
+	testing.expect_value(t, counts[0], 1)
+	testing.expect_value(t, counts[1], 6)
+}
+
+@(test)
+test_coord_ij_round_trip :: proc(t: ^testing.T) {
+	origin: h3.Index = 0x8a2a1072b59ffff
+	ij: h3.CoordIJ
+	if !expect_success(t, h3.cellToLocalIj(origin, origin, 0, &ij)) {
+		return
+	}
+
+	cell: h3.Index
+	if expect_success(t, h3.localIjToCell(origin, &ij, 0, &cell)) {
+		testing.expect_value(t, cell, origin)
+	}
+}
+
+@(test)
+test_h3_string_output_buffer :: proc(t: ^testing.T) {
+	cell: h3.Index = 0x8a2a1072b59ffff
+	buffer: [17]c.char
+	if expect_success(t, h3.h3ToString(cell, &buffer[0], len(buffer))) {
+		testing.expect_value(t, string(cstring(&buffer[0])), "8a2a1072b59ffff")
+	}
 }

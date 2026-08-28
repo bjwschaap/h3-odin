@@ -17,15 +17,15 @@ haversineDistance :: proc(th1, ph1, th2, ph2: f64) -> f64{
 
 distance :: proc() {
     h3HQ1, h3HQ2: h3.Index 
-    h3.stringToH3("8f2830828052d25", &h3HQ1)
-    h3.stringToH3("8f283082a30e623", &h3HQ2)
+    assert_success(h3.stringToH3("8f2830828052d25", &h3HQ1))
+    assert_success(h3.stringToH3("8f283082a30e623", &h3HQ2))
 
     geoHQ1, geoHQ2: h3.LatLng
-    h3.cellToLatLng(h3HQ1, &geoHQ1)
-    h3.cellToLatLng(h3HQ2, &geoHQ2)
+    assert_success(h3.cellToLatLng(h3HQ1, &geoHQ1))
+    assert_success(h3.cellToLatLng(h3HQ2, &geoHQ2))
 
     distance: i64
-    runtime.assert(h3.gridDistance(h3HQ1, h3HQ2, &distance) == u32(h3.error_codes.E_SUCCESS))
+    runtime.assert(h3.gridDistance(h3HQ1, h3HQ2, &distance) == .E_SUCCESS)
 
     fmt.printf( "origin: (%.6f, %.6f)\n" +
         "destination: (%.6f, %.6f)\n" +

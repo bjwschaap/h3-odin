@@ -22,3 +22,14 @@ python3 ./gen_procedures.py > ../procedures.odin
 cd examples
 odin test .
 ```
+
+## Error handling
+
+H3 procedures return an `Error` enum with the same `u32` representation as the
+C API. Enum values can be compared directly, without casts:
+
+```odin
+if err := h3.latLngToCell(&location, 10, &cell); err != .E_SUCCESS {
+	fmt.println(h3.error_message(err))
+}
+```
