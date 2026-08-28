@@ -27,12 +27,14 @@ distance :: proc() {
     distance: i64
     runtime.assert(h3.gridDistance(h3HQ1, h3HQ2, &distance) == .E_SUCCESS)
 
+    geoHQ1Deg := h3.lat_lng_to_degrees(geoHQ1)
+    geoHQ2Deg := h3.lat_lng_to_degrees(geoHQ2)
     fmt.printf( "origin: (%.6f, %.6f)\n" +
         "destination: (%.6f, %.6f)\n" +
         "grid distance: %d\n" +
         "distance in km: %.6fkm\n", +
-        h3.radsToDegs(geoHQ1.lat), h3.radsToDegs(geoHQ1.lng),
-        h3.radsToDegs(geoHQ2.lat), h3.radsToDegs(geoHQ2.lng),
+        geoHQ1Deg.lat, geoHQ1Deg.lng,
+        geoHQ2Deg.lat, geoHQ2Deg.lng,
         distance,
         haversineDistance(geoHQ1.lat, geoHQ1.lng, geoHQ2.lat, geoHQ2.lng))
     

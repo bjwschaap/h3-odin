@@ -40,6 +40,6 @@ index :: proc(){
         return
     }
     
-    fmt.printf("Center coordinates: %.6f, %.6f\n", h3.radsToDegs(center.lat),
-           h3.radsToDegs(center.lng))
+    center_degrees := h3.lat_lng_to_degrees(center)
+    fmt.printf("Center coordinates: %.6f, %.6f\n", center_degrees.lat, center_degrees.lng)
 }

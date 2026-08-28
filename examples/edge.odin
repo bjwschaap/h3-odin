@@ -12,10 +12,8 @@ edge :: proc() {
     boundary: h3.CellBoundary
     assert_success(h3.directedEdgeToBoundary(edge, &boundary))
     for i in 0..<int(boundary.numVerts) {
-        fmt.printf("Edge vertex #%d: %.6f, %.6f\n",
-            i,
-            h3.radsToDegs(boundary.verts[i].lat),
-            h3.radsToDegs(boundary.verts[i].lng))
+        pos_degrees := h3.lat_lng_to_degrees(boundary.verts[i])
+        fmt.printf("Edge vertex #%d: %.6f, %.6f\n", i, pos_degrees.lat, pos_degrees.lng)
     }
 
     // Output:
