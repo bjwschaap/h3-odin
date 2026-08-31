@@ -2,3 +2,4 @@
 examples/examples.bin
 h3
 h3-odin.bin
+_gen/libh3_*.a
